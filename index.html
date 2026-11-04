@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dia e Noite - Moda e Conforto | Planaltina DF</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FFF5F7; /* Suave tom rosado de fundo */
+            color: #3C2A2B;
+        }
+        h1, h2, h3, h4, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #581C25;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 14px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 10px 25px -5px rgba(88,28,37,0.3);
+            font-size: 13px;
+            letter-spacing: 0.05em;
+        }
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.3s, fadeout 0.3s 2.5s;
+        }
+        @keyframes fadein {
+            from { bottom: 0; opacity: 0; }
+            to { bottom: 30px; opacity: 1; }
+        }
+        @keyframes fadeout {
+            from { bottom: 30px; opacity: 1; }
+            to { bottom: 0; opacity: 0; }
+        }
+        .cart-sidebar {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .cart-sidebar.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-rose-200 selection:text-rose-950">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-gradient-to-r from-[#581C25] via-[#881337] to-[#581C25] text-amber-100 text-[11px] tracking-[0.2em] uppercase py-2.5 px-4 text-center font-medium shadow-inner">
+        ✨ Planaltina, DF • Atendimento com carinho e exclusividade ✨
+    </div>
+
+    <!-- Main Header -->
+    <header id="main-header" class="sticky top-0 z-40 bg-[#FFF5F7]/90 backdrop-blur-md border-b border-rose-200/60 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 text-rose-950 hover:text-rose-800">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3 cursor-pointer" id="nav-logo">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 via-rose-300 to-amber-200 p-[1.5px] shadow-md flex items-center justify-center">
+                    <div class="w-full h-full bg-[#FFF5F7] rounded-full flex items-center justify-center">
+                        <span class="font-serif font-bold text-rose-950 text-sm">DN</span>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-serif text-lg font-bold tracking-wider text-rose-950 leading-none">Dia e Noite</h1>
+                    <span class="text-[9px] uppercase tracking-[0.25em] text-rose-800/70 font-semibold">Moda e Conforto</span>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation Links -->
+            <nav class="hidden md:flex items-center gap-8">
+                <button data-cat="Início" class="nav-category text-xs font-bold tracking-widest uppercase transition-colors text-rose-950 underline underline-offset-8">Início</button>
+                <button data-cat="Lingerie" class="nav-category text-xs font-semibold tracking-widest uppercase transition-colors text-rose-900/70 hover:text-rose-950">Lingerie</button>
+                <button data-cat="Feminino" class="nav-category text-xs font-semibold tracking-widest uppercase transition-colors text-rose-900/70 hover:text-rose-950">Feminino</button>
+                <button data-cat="Masculino" class="nav-category text-xs font-semibold tracking-widest uppercase transition-colors text-rose-900/70 hover:text-rose-950">Masculino</button>
+                <button data-cat="Fitness" class="nav-category text-xs font-semibold tracking-widest uppercase transition-colors text-rose-900/70 hover:text-rose-950">Fitness</button>
+                <button data-cat="Pijamas" class="nav-category text-xs font-semibold tracking-widest uppercase transition-colors text-rose-900/70 hover:text-rose-950">Pijamas</button>
+            </nav>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-3">
+                <button id="cart-toggle" class="relative p-2.5 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-950 transition-colors shadow-sm">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    <span id="cart-badge" class="absolute -top-1 -right-1 bg-[#881337] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold hidden shadow-sm">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobile-nav" class="hidden md:hidden absolute top-full left-0 w-full bg-[#FFF5F7] border-b border-rose-200 py-6 px-6 shadow-xl flex flex-col gap-4">
+            <button data-cat="Início" class="nav-category text-left text-sm font-bold uppercase tracking-widest text-rose-950 py-2 border-b border-rose-100">Início</button>
+            <button data-cat="Lingerie" class="nav-category text-left text-sm font-semibold uppercase tracking-widest text-rose-900/80 py-2 border-b border-rose-100">Lingerie</button>
+            <button data-cat="Feminino" class="nav-category text-left text-sm font-semibold uppercase tracking-widest text-rose-900/80 py-2 border-b border-rose-100">Feminino</button>
+            <button data-cat="Masculino" class="nav-category text-left text-sm font-semibold uppercase tracking-widest text-rose-900/80 py-2 border-b border-rose-100">Masculino</button>
+            <button data-cat="Fitness" class="nav-category text-left text-sm font-semibold uppercase tracking-widest text-rose-900/80 py-2 border-b border-rose-100">Fitness</button>
+            <button data-cat="Pijamas" class="nav-category text-left text-sm font-semibold uppercase tracking-widest text-rose-900/80 py-2">Pijamas</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 w-full flex flex-col relative">
+        
+        <!-- Loading Indicator -->
+        <div id="app-loading" class="fixed inset-0 bg-[#FFF5F7] z-30 flex items-center justify-center">
+            <div class="flex flex-col items-center gap-4">
+                <i data-lucide="loader" class="w-8 h-8 text-rose-900 animate-spin"></i>
+                <p class="text-xs uppercase tracking-[0.2em] text-rose-900 font-bold animate-pulse">Carregando Coleção</p>
+            </div>
+        </div>
+
+        <!-- CLIENT VIEW -->
+        <div id="client-view" class="w-full flex flex-col">
+            
+            <!-- HOME / HERO VIEW -->
+            <section id="hero-section" class="w-full flex flex-col">
+                <!-- Luxury Banner -->
+                <div class="relative w-full bg-gradient-to-br from-[#581C25] via-[#701A2C] to-[#3C1016] text-[#F3EFEA] py-24 lg:py-32 overflow-hidden shadow-xl">
+                    <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#F59E0B_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col items-center text-center">
+                        <span class="text-xs uppercase tracking-[0.3em] text-amber-300 font-bold mb-4 bg-black/20 px-4 py-1.5 rounded-full border border-amber-400/30">Coleção Exclusiva</span>
+                        <h2 class="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 max-w-3xl leading-[1.1]">
+                            Moda e Conforto para todas as suas fases
+                        </h2>
+                        <p class="text-rose-100/80 text-sm sm:text-base max-w-xl mb-10 font-light leading-relaxed">
+                            Descubra peças delicadas, sofisticadas e pensadas para realçar sua essência com o máximo de aconchego.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                            <button id="start-shopping" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-stone-950 px-8 py-4 rounded-full text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-xl hover:shadow-amber-500/20 transform hover:-translate-y-0.5">
+                                Ver Coleção Completa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trust Badges -->
+                <div class="border-y border-rose-200 bg-white/80 py-8 shadow-sm">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center text-rose-900 mb-1">
+                                <i data-lucide="map-pin" class="w-6 h-6 text-amber-600"></i>
+                            </div>
+                            <h4 class="font-serif font-bold text-sm text-stone-900">Planaltina, DF</h4>
+                            <p class="text-xs text-stone-500">Atendimento e entrega rápida na região</p>
+                        </div>
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center text-rose-900 mb-1">
+                                <i data-lucide="sparkles" class="w-6 h-6 text-amber-600"></i>
+                            </div>
+                            <h4 class="font-serif font-bold text-sm text-stone-900">Qualidade que você sente</h4>
+                            <p class="text-xs text-stone-500">Tecidos selecionados e toque suave</p>
+                        </div>
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center text-rose-900 mb-1">
+                                <i data-lucide="message-circle" class="w-6 h-6 text-amber-600"></i>
+                            </div>
+                            <h4 class="font-serif font-bold text-sm text-stone-900">Atendimento com carinho</h4>
+                            <p class="text-xs text-stone-500">Suporte personalizado pelo WhatsApp</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Categories Preview -->
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
+                    <div class="flex justify-between items-end mb-12">
+                        <div>
+                            <span class="text-xs uppercase tracking-[0.2em] text-amber-700 font-bold">Vitrine</span>
+                            <h3 class="font-serif text-3xl sm:text-4xl font-bold text-rose-950 mt-1">Destaques da Estação</h3>
+                        </div>
+                        <button onclick="setCategory('Todas')" class="text-xs font-bold uppercase tracking-widest text-rose-950 hover:text-amber-700 transition-colors flex items-center gap-2">
+                            Ver Todos <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Grid of Featured Products -->
+                    <div id="home-featured-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SHOP CATALOG VIEW -->
+            <section id="shop-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 pb-6 border-b border-rose-200 gap-4">
+                    <div>
+                        <span class="text-xs uppercase tracking-[0.2em] text-amber-700 font-bold">Catálogo Online</span>
+                        <h2 id="current-category-title" class="font-serif text-3xl sm:text-4xl font-bold text-rose-950 mt-1">Todas as Peças</h2>
+                    </div>
+                    <span id="category-count" class="text-xs uppercase tracking-widest text-rose-800 font-medium bg-rose-100/60 px-4 py-2 rounded-full">Exibindo peças</span>
+                </div>
+
+                <div id="no-products-msg" class="text-center py-24 hidden">
+                    <p class="font-serif text-lg text-stone-500 mb-4">Nenhuma peça cadastrada nesta categoria ainda.</p>
+                </div>
+
+                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Products injected dynamically -->
+                </div>
+            </section>
+        </div>
+
+        <!-- ADMIN VIEW (Dashboard) -->
+        <div id="admin-view" class="w-full flex flex-col py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 pb-6 border-b border-rose-200 gap-4">
+                <div>
+                    <span class="text-xs uppercase tracking-[0.2em] text-amber-700 font-bold">Painel de Controle</span>
+                    <h2 class="font-serif text-3xl font-bold text-rose-950 mt-1">Gerenciamento da Loja</h2>
+                </div>
+                <button id="btn-back-store" class="bg-rose-950 text-white px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-black transition-colors shadow-md">
+                    Voltar para a Loja
+                </button>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-2xl border border-rose-200 shadow-sm">
+                    <span class="text-xs uppercase tracking-widest text-stone-400 font-bold">Total de Peças</span>
+                    <h3 id="stat-total-products" class="font-serif text-3xl font-bold text-rose-950 mt-2">0</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-rose-200 shadow-sm">
+                    <span class="text-xs uppercase tracking-widest text-stone-400 font-bold">Valor em Estoque</span>
+                    <h3 id="stat-total-value" class="font-serif text-3xl font-bold text-rose-950 mt-2">R$ 0,00</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-rose-200 shadow-sm">
+                    <span class="text-xs uppercase tracking-widest text-stone-400 font-bold">Categorias Ativas</span>
+                    <h3 id="stat-categories" class="font-serif text-3xl font-bold text-rose-950 mt-2">0</h3>
+                </div>
+            </div>
+
+            <!-- Add Product & Management Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Form to Add Product -->
+                <div class="bg-white p-8 rounded-2xl border border-rose-200 shadow-sm lg:col-span-1 h-fit">
+                    <h3 class="font-serif text-xl font-bold text-rose-950 mb-6">Cadastrar Nova Peça</h3>
+                    <form id="add-product-form" class="space-y-5">
+                        <div>
+                            <label class="block text-xs uppercase tracking-wider text-rose-950 font-bold mb-2">Nome da Peça</label>
+                            <input type="text" id="prod-title" required class="w-full px-4 py-3 rounded-xl border border-rose-200 text-sm focus:outline-none focus:border-rose-900 bg-rose-50/30" placeholder="Ex: Conjunto Renda Boudoir">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase tracking-wider text-rose-950 font-bold mb-2">Preço (R$)</label>
+                            <input type="number" step="0.01" id="prod-price" required class="w-full px-4 py-3 rounded-xl border border-rose-200 text-sm focus:outline-none focus:border-rose-900 bg-rose-50/30" placeholder="129.90">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase tracking-wider text-rose-950 font-bold mb-2">Categoria</label>
+                            <select id="prod-category" class="w-full px-4 py-3 rounded-xl border border-rose-200 text-sm focus:outline-none focus:border-rose-900 bg-white">
+                                <option value="Lingerie">Lingerie</option>
+                                <option value="Feminino">Feminino</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Fitness">Fitness</option>
+                                <option value="Pijamas">Pijamas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase tracking-wider text-rose-950 font-bold mb-2">Foto do Produto</label>
+                            <div class="border-2 border-dashed border-rose-200 rounded-xl p-6 text-center hover:border-rose-900 transition-colors cursor-pointer relative bg-rose-50/50">
+                                <input type="file" id="prod-image-file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                <div class="flex flex-col items-center gap-2">
+                                    <i data-lucide="image-plus" class="w-8 h-8 text-rose-800/70"></i>
+                                    <span class="text-xs text-rose-900 font-semibold">Clique para selecionar foto</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="prod-image-base64">
+                            <div id="image-preview-container" class="mt-4 relative hidden">
+                                <img id="image-preview" class="w-full h-40 object-cover rounded-xl border border-rose-200">
+                                <button type="button" id="btn-remove-image" class="absolute top-2 right-2 bg-red-600 text-white p-1.5 rounded-full text-xs shadow hover:bg-red-700">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-rose-950 hover:bg-black text-white py-4 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-colors shadow-md">
+                            Adicionar ao Catálogo
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Products Table -->
+                <div class="bg-white rounded-2xl border border-rose-200 shadow-sm lg:col-span-2 overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-rose-100 bg-rose-50/20">
+                        <h3 class="font-serif text-xl font-bold text-rose-950">Catálogo Atual</h3>
+                    </div>
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-rose-50/50 border-b border-rose-100 text-[11px] uppercase tracking-wider text-rose-900 font-bold">
+                                    <th class="py-4 px-6 text-center">Foto</th>
+                                    <th class="py-4 px-6">Produto</th>
+                                    <th class="py-4 px-6">Categoria</th>
+                                    <th class="py-4 px-6 text-right">Preço</th>
+                                    <th class="py-4 px-6 text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-product-list" class="divide-y divide-rose-100 text-sm">
+                                <!-- Dynamic items -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="admin-empty-msg" class="p-12 text-center hidden">
+                        <p class="text-stone-400 text-sm font-serif">Nenhum produto cadastrado no momento.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Shopping Cart Sidebar Drawer -->
+    <div id="cart-overlay" class="fixed inset-0 bg-stone-950/60 z-50 backdrop-blur-sm hidden opacity-0 transition-opacity"></div>
+    <div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 bottom-0 w-full max-w-md bg-white z-50 shadow-2xl flex flex-col">
+        <div class="p-6 border-b border-rose-100 flex items-center justify-between bg-rose-50/40">
+            <div class="flex items-center gap-2">
+                <i data-lucide="shopping-bag" class="w-5 h-5 text-rose-950"></i>
+                <h3 class="font-serif font-bold text-lg text-rose-950">Sua Sacola</h3>
+            </div>
+            <button id="close-cart" class="p-2 text-rose-900/60 hover:text-rose-950">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <div id="empty-cart-msg" class="text-center py-20">
+                <i data-lucide="shopping-bag" class="w-12 h-12 mx-auto text-rose-200 mb-4"></i>
+                <p class="font-serif text-rose-950 text-base mb-1">Sua sacola está vazia</p>
+                <p class="text-xs text-stone-400">Escolha peças encantadoras para começar.</p>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-rose-100 bg-rose-50/40 space-y-4">
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-rose-900/70 font-bold uppercase tracking-wider text-xs">Subtotal</span>
+                <span id="cart-total" class="font-serif font-bold text-xl text-rose-950">R$ 0,00</span>
+            </div>
+            <button id="checkout-btn" disabled class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-300 disabled:cursor-not-allowed text-white py-4 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2 shadow-md">
+                <i data-lucide="message-circle" class="w-4 h-4"></i> Finalizar Pedido no WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-br from-[#3C1016] via-[#581C25] to-[#2D0A0E] text-[#F3EFEA] pt-16 pb-12 mt-auto border-t border-rose-950">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-400 via-rose-300 to-amber-200 p-[1px] flex items-center justify-center">
+                        <div class="w-full h-full bg-[#3C1016] rounded-full flex items-center justify-center">
+                            <span class="font-serif font-bold text-amber-300 text-xs">DN</span>
+                        </div>
+                    </div>
+                    <h2 class="font-serif text-lg font-bold tracking-wider">Dia e Noite</h2>
+                </div>
+                <p class="text-xs text-rose-100/70 font-light leading-relaxed max-w-sm">
+                    Moda íntima, pijamas e conforto confeccionados para elevar sua autoestima em todos os momentos do seu dia. Planaltina - DF.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-serif text-sm font-bold uppercase tracking-widest text-amber-300 mb-4">Atendimento</h4>
+                <p class="text-xs text-rose-100/90 mb-2 font-medium">WhatsApp: (61) 99112-4036</p>
+                <p class="text-xs text-rose-100/70">Planaltina, Distrito Federal</p>
+            </div>
+            <div>
+                <h4 class="font-serif text-sm font-bold uppercase tracking-widest text-amber-300 mb-4">Área Administrativa</h4>
+                <button id="btn-admin-access" class="text-xs font-bold uppercase tracking-widest text-amber-200 hover:text-white transition-colors underline underline-offset-4">
+                    Acesso do Lojista
+                </button>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-rose-900/40 text-center text-[11px] text-rose-200/50 uppercase tracking-widest">
+            &copy; 2026 Dia e Noite - Moda e Conforto. Todos os direitos reservados.
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast"></div>
+
+    <!-- Script Application Logic -->
+    <script>
+        // --- Initial State ---
+        let products = [
+            {
+                id: "1",
+                title: "Conjunto Renda Boudoir",
+                price: 129.90,
+                category: "Lingerie",
+                imageUrl: "https://images.unsplash.com/photo-1599387737837-77579c09eeea?w=600&auto=format&fit=crop&q=80"
+            },
+            {
+                id: "2",
+                title: "Pijama Satin Rose",
+                price: 189.90,
+                category: "Pijamas",
+                imageUrl: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop&q=80"
+            },
+            {
+                id: "3",
+                title: "Body Luxo Velvet",
+                price: 149.90,
+                category: "Lingerie",
+                imageUrl: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=600&auto=format&fit=crop&q=80"
+            },
+            {
+                id: "4",
+                title: "Camisola Elegance Seda",
+                price: 160.00,
+                category: "Pijamas",
+                imageUrl: "https://images.unsplash.com/photo-1616422285623-14ff018903c7?w=600&auto=format&fit=crop&q=80"
+            }
+        ];
+        let cart = [];
+        let currentCategory = 'Início';
+        let isAdmin = false;
+
+        // --- App Initialization ---
+        function initApp() {
+            const saved = localStorage.getItem('dia_noite_products');
+            if (saved) {
+                try {
+                    products = JSON.parse(saved);
+                } catch (e) {
+                    console.error("Erro ao carregar do armazenamento local", e);
+                }
+            } else {
+                localStorage.setItem('dia_noite_products', JSON.stringify(products));
+            }
+
+            const loadingEl = document.getElementById('app-loading');
+            if (loadingEl) loadingEl.classList.add('hidden');
+
+            renderProducts();
+            renderAdminList();
+            updateCartBadge();
+            lucide.createIcons();
+        }
+
+        function saveProductsToStorage() {
+            localStorage.setItem('dia_noite_products', JSON.stringify(products));
+        }
+
+        // --- UI Rendering Functions ---
+        function formatMoney(value) {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            
+            document.querySelectorAll('.nav-category').forEach(b => {
+                if (b.dataset.cat === cat) {
+                    b.classList.add('text-rose-950', 'font-bold', 'underline', 'underline-offset-8');
+                    b.classList.remove('text-rose-900/70', 'font-semibold');
+                } else {
+                    b.classList.remove('text-rose-950', 'font-bold', 'underline', 'underline-offset-8');
+                    b.classList.add('text-rose-900/70', 'font-semibold');
+                }
+            });
+
+            const heroSection = document.getElementById('hero-section');
+            const shopSection = document.getElementById('shop-section');
+
+            if (cat === 'Início') {
+                heroSection.classList.remove('hidden');
+                shopSection.classList.add('hidden');
+                renderHomeFeatured();
+            } else {
+                heroSection.classList.add('hidden');
+                shopSection.classList.remove('hidden');
+                document.getElementById('current-category-title').textContent = cat === 'Todas' ? 'Catálogo Completo' : cat;
+                renderProducts();
+            }
+            
+            document.getElementById('mobile-nav').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderHomeFeatured() {
+            const grid = document.getElementById('home-featured-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            const featured = products.slice(0, 4);
+            featured.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "group cursor-pointer flex flex-col bg-white p-3 rounded-2xl border border-rose-100 shadow-sm hover:shadow-md transition-all";
+                card.innerHTML = `
+                    <div class="aspect-[3/4] bg-rose-50 mb-4 overflow-hidden relative rounded-xl">
+                        <img src="${p.imageUrl}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                        <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-stone-950/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
+                            <button onclick="addToCart('${p.id}')" class="w-full bg-white text-stone-900 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-rose-950 hover:text-white transition-colors rounded-lg shadow-sm">
+                                Adicionar
+                            </button>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-amber-700 font-bold uppercase tracking-widest mb-1">${p.category}</span>
+                    <h4 class="font-serif font-medium text-rose-950 text-base mb-1 truncate">${p.title}</h4>
+                    <span class="font-serif font-bold text-rose-900 text-sm">${formatMoney(p.price)}</span>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            const noMsg = document.getElementById('no-products-msg');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            
+            const filtered = currentCategory === 'Todas' ? products : products.filter(p => p.category === currentCategory);
+            
+            document.getElementById('category-count').textContent = `Exibindo ${filtered.length} peça(s).`;
+
+            if (filtered.length === 0) {
+                noMsg.classList.remove('hidden');
+                return;
+            }
+            
+            noMsg.classList.add('hidden');
+            
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "group cursor-pointer flex flex-col bg-white p-3 rounded-2xl border border-rose-100 shadow-sm hover:shadow-md transition-all";
+                card.innerHTML = `
+                    <div class="aspect-[3/4] bg-rose-50 mb-4 overflow-hidden relative rounded-xl">
+                        <img src="${p.imageUrl}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                        <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-stone-950/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
+                            <button onclick="addToCart('${p.id}')" class="w-full bg-white text-stone-900 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-rose-950 hover:text-white transition-colors rounded-lg shadow-sm">
+                                Adicionar à Sacola
+                            </button>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-amber-700 font-bold uppercase tracking-widest mb-1">${p.category}</span>
+                    <h4 class="font-serif font-medium text-rose-950 text-base mb-1 truncate">${p.title}</h4>
+                    <span class="font-serif font-bold text-rose-900 text-base">${formatMoney(p.price)}</span>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // --- Cart Logic ---
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            const isOpen = sidebar.classList.contains('open');
+            
+            if (isOpen) {
+                sidebar.classList.remove('open');
+                overlay.classList.add('hidden');
+                overlay.classList.remove('opacity-100');
+            } else {
+                sidebar.classList.add('open');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('opacity-100'), 10);
+                renderCartItems();
+            }
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const existing = cart.find(item => item.product.id === productId);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ product, quantity: 1 });
+            }
+            
+            updateCartBadge();
+            showToast(`"${product.title}" adicionado à sacola!`);
+            if (document.getElementById('cart-sidebar').classList.contains('open')) {
+                renderCartItems();
+            }
+        }
+
+        function updateCartQuantity(productId, delta) {
+            const item = cart.find(i => i.product.id === productId);
+            if (!item) return;
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                cart = cart.filter(i => i.product.id !== productId);
+            }
+            updateCartBadge();
+            renderCartItems();
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-badge');
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            if (totalCount > 0) {
+                badge.textContent = totalCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items-container');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            const cartTotal = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            
+            const existingItems = container.querySelectorAll('.cart-item-row');
+            existingItems.forEach(el => el.remove());
+            
+            if (cart.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                cartTotal.textContent = formatMoney(0);
+                checkoutBtn.disabled = true;
+                return;
+            }
+            
+            emptyMsg.classList.add('hidden');
+            checkoutBtn.disabled = false;
+            
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.product.price * item.quantity;
+                total += itemTotal;
+                
+                const div = document.createElement('div');
+                div.className = "cart-item-row flex items-center gap-4 pb-4 border-b border-rose-100";
+                div.innerHTML = `
+                    <div class="w-16 h-20 bg-rose-50 rounded-lg overflow-hidden flex-shrink-0 border border-rose-200">
+                        <img src="${item.product.imageUrl}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-serif text-sm font-medium text-rose-950 mb-1">${item.product.title}</h4>
+                        <span class="text-xs font-bold text-rose-900">${formatMoney(item.product.price)}</span>
+                        <div class="flex items-center gap-3 mt-2">
+                            <div class="flex items-center border border-rose-200 rounded-lg bg-rose-50/50">
+                                <button onclick="window.updateCartQuantity('${item.product.id}', -1)" class="px-2.5 py-0.5 text-rose-900 hover:text-black">-</button>
+                                <span class="px-2 text-xs font-bold">${item.quantity}</span>
+                                <button onclick="window.updateCartQuantity('${item.product.id}', 1)" class="px-2.5 py-0.5 text-rose-900 hover:text-black">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="font-serif text-sm font-bold text-rose-950">${formatMoney(itemTotal)}</span>
+                `;
+                container.appendChild(div);
+            });
+            
+            cartTotal.textContent = formatMoney(total);
+            lucide.createIcons();
+        }
+
+        function handleWhatsAppCheckout() {
+            if (cart.length === 0) return;
+            let text = `Olá! Gostaria de finalizar meu pedido na *Dia e Noite* 🌙✨ (Planaltina - DF)\n\n*Minha Sacola:*\n\n`;
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.product.price * item.quantity;
+                total += itemTotal;
+                text += `▪️ ${item.quantity}x ${item.product.title} - ${formatMoney(itemTotal)}\n`;
+            });
+            text += `\n*Subtotal:* ${formatMoney(total)}\n\nAguardo instruções para entrega em Planaltina-DF!`;
+            const phoneNumber = "5561991124036"; 
+            window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // --- Admin Functions ---
+        function toggleAdmin() {
+            isAdmin = !isAdmin;
+            if (isAdmin) {
+                document.getElementById('client-view').classList.add('hidden');
+                document.getElementById('admin-view').classList.remove('hidden');
+                document.getElementById('main-header').classList.add('hidden');
+            } else {
+                document.getElementById('admin-view').classList.add('hidden');
+                document.getElementById('client-view').classList.remove('hidden');
+                document.getElementById('main-header').classList.remove('hidden');
+            }
+        }
+
+        function renderAdminList() {
+            const list = document.getElementById('admin-product-list');
+            const emptyMsg = document.getElementById('admin-empty-msg');
+            if (!list) return;
+            
+            list.innerHTML = '';
+            
+            const totalValue = products.reduce((sum, p) => sum + p.price, 0);
+            const uniqueCats = new Set(products.map(p => p.category)).size;
+            document.getElementById('stat-total-products').textContent = products.length;
+            document.getElementById('stat-total-value').textContent = formatMoney(totalValue);
+            document.getElementById('stat-categories').textContent = uniqueCats;
+
+            if (products.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                return;
+            }
+            
+            emptyMsg.classList.add('hidden');
+            products.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-3 px-6">
+                        <div class="w-12 h-16 mx-auto bg-rose-50 border border-rose-200 rounded-lg overflow-hidden">
+                            <img src="${p.imageUrl}" class="w-full h-full object-cover">
+                        </div>
+                    </td>
+                    <td class="py-3 px-6 font-medium text-rose-950">${p.title}</td>
+                    <td class="py-3 px-6"><span class="bg-rose-100 text-rose-900 text-[10px] px-2.5 py-1 rounded-full uppercase font-bold tracking-wider">${p.category}</span></td>
+                    <td class="py-3 px-6 font-bold text-right text-rose-950">${formatMoney(p.price)}</td>
+                    <td class="py-3 px-6 text-center">
+                        <button onclick="window.deleteProduct('${p.id}')" class="text-rose-400 hover:text-red-600 p-2 transition-colors">
+                            <i data-lucide="trash-2" class="w-4 h-4 mx-auto"></i>
+                        </button>
+                    </td>
+                `;
+                list.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function deleteProduct(id) {
+            products = products.filter(p => p.id !== id);
+            saveProductsToStorage();
+            renderAdminList();
+            renderProducts();
+            showToast("Produto removido com sucesso.");
+        }
+
+        function handleAddProduct(e) {
+            e.preventDefault();
+            const title = document.getElementById('prod-title').value;
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const category = document.getElementById('prod-category').value;
+            const imageUrl = document.getElementById('prod-image-base64').value;
+
+            if (!imageUrl) {
+                showToast("Por favor, selecione uma foto para o produto.");
+                return;
+            }
+
+            const newProduct = {
+                id: Date.now().toString(),
+                title,
+                price,
+                category,
+                imageUrl
+            };
+
+            products.unshift(newProduct);
+            saveProductsToStorage();
+            renderAdminList();
+            renderProducts();
+
+            document.getElementById('add-product-form').reset();
+            resetImageUpload();
+            showToast("Produto cadastrado com sucesso!");
+        }
+
+        function resetImageUpload() {
+            document.getElementById('prod-image-base64').value = '';
+            document.getElementById('image-preview').src = '';
+            document.getElementById('image-preview-container').classList.add('hidden');
+        }
+
+        // Global exposure
+        window.addToCart = addToCart;
+        window.updateCartQuantity = updateCartQuantity;
+        window.deleteProduct = deleteProduct;
+        window.setCategory = setCategory;
+
+        // --- Event Listeners Setup ---
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.nav-category').forEach(btn => btn.addEventListener('click', (e) => setCategory(e.target.dataset.cat)));
+            document.getElementById('cart-toggle').addEventListener('click', toggleCart);
+            document.getElementById('close-cart').addEventListener('click', toggleCart);
+            document.getElementById('cart-overlay').addEventListener('click', toggleCart);
+            document.getElementById('start-shopping').addEventListener('click', () => { toggleCart(); setCategory('Todas'); });
+            document.getElementById('checkout-btn').addEventListener('click', handleWhatsAppCheckout);
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => document.getElementById('mobile-nav').classList.toggle('hidden'));
+
+            // Admin Login Modal
+            const adminModal = document.createElement('div');
+            adminModal.id = 'admin-login-modal';
+            adminModal.className = "fixed inset-0 bg-stone-950/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 transition-opacity hidden";
+            adminModal.innerHTML = `
+                <div id="admin-login-box" class="bg-white p-8 rounded-2xl max-w-sm w-full mx-4 shadow-2xl scale-95 transition-transform border border-rose-200">
+                    <h3 class="font-serif text-2xl font-bold text-rose-950 mb-2">Área do Lojista</h3>
+                    <p class="text-xs text-rose-800/70 mb-6 uppercase tracking-wider font-semibold">Digite a senha administrativa</p>
+                    <input type="password" id="admin-password-input" class="w-full px-4 py-3 rounded-xl border border-rose-200 outline-none focus:border-rose-900 text-sm mb-4 bg-rose-50/30" placeholder="Senha">
+                    <div class="flex gap-3">
+                        <button id="btn-cancel-login" class="flex-1 bg-stone-100 py-3 rounded-xl text-xs font-bold uppercase tracking-widest text-stone-600 hover:bg-stone-200">Cancelar</button>
+                        <button id="btn-confirm-login" class="flex-1 bg-rose-950 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-black shadow-md">Entrar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(adminModal);
+
+            const passInput = document.getElementById('admin-password-input');
+            
+            document.getElementById('btn-admin-access').addEventListener('click', (e) => {
+                e.preventDefault();
+                adminModal.classList.remove('hidden');
+                setTimeout(() => {
+                    adminModal.classList.remove('opacity-0');
+                    document.getElementById('admin-login-box').classList.remove('scale-95');
+                }, 10);
+                passInput.value = '';
+                passInput.focus();
+            });
+
+            document.getElementById('btn-cancel-login').addEventListener('click', () => {
+                adminModal.classList.add('opacity-0');
+                document.getElementById('admin-login-box').classList.add('scale-95');
+                setTimeout(() => adminModal.classList.add('hidden'), 300);
+            });
+
+            const handleLogin = () => {
+                // Senha forte atualizada para maior segurança do lojista
+                if (passInput.value === '@DiaEnoite2026!') {
+                    document.getElementById('btn-cancel-login').click();
+                    toggleAdmin();
+                    showToast("Login autorizado com sucesso.");
+                } else {
+                    showToast("Senha incorreta. Tente novamente.");
+                    passInput.value = '';
+                }
+            };
+
+            document.getElementById('btn-confirm-login').addEventListener('click', handleLogin);
+            passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+            document.getElementById('btn-back-store').addEventListener('click', toggleAdmin);
+            document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
+
+            // Image upload handling with compression
+            const prodImageFile = document.getElementById('prod-image-file');
+            prodImageFile.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width, height = img.height;
+                        if (width > 800) { height *= 800 / width; width = 800; }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        document.getElementById('prod-image-base64').value = dataUrl;
+                        document.getElementById('image-preview').src = dataUrl;
+                        document.getElementById('image-preview-container').classList.remove('hidden');
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            document.getElementById('btn-remove-image').addEventListener('click', resetImageUpload);
+            document.getElementById('nav-logo').addEventListener('click', () => setCategory('Início'));
+
+            initApp();
+        });
+    </script>
+</body>
+</html>
